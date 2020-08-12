@@ -26,7 +26,10 @@ with open(csvpath, encoding="utf-8-sig") as csvfile:
 # Create variables
     total = 0.0      
     count = 0
+    profit_losses = []
 
+    total_diff = 0
+    average_diff = 0.00
     gtProfitValue = 0
     gtProfitMonth = ""
     gtLossValue = 0
@@ -36,26 +39,33 @@ with open(csvpath, encoding="utf-8-sig") as csvfile:
     for row in csvreader:
         total += float(row[1])              #Calculate Total Profit/Losses
         count += 1                          #Calculate number of months
-        mean = total/count                  #Calculate average
+        profit_losses.append(row)           #Generate list
+    
+#Loop profit/losses list and look for increase/decrease 
+# and calculate differences
+    for i in range(1, count, 1):           
+      diff = int(profit_losses[i][1]) - int(profit_losses[i-1][1])
+      total_diff = total_diff + diff
 
 #Test and set Greatest increase in profits
-        if int(row[1]) > gtProfitValue:     
-            gtProfitValue = int(row[1])
-            gtProfitMonth = row[0]
+      if diff > gtProfitValue:     
+          gtProfitValue = diff
+          gtProfitMonth = profit_losses[i][0]
 
 #Test and set Greatest decrease in losses
-        if int(row[1]) < gtLossValue:
-            gtLossValue = int(row[1])
-            gtLossMonth = row[0]
+      if diff < gtLossValue:
+          gtLossValue = diff
+          gtLossMonth = profit_losses[i][0]
 
+average_diff = total_diff / (count-1)
 
-# Print analysis and write file
+#Print analysis and write file
 print(f"""
 Financial Analisys
 ---------------------------
 Total Months: {count}
-Total: ${total}
-Average Change: ${round(mean,2)}
+Total: ${round(total)}
+Average Change: ${round(average_diff,2)}
 Greatest Increase in Profits: {gtProfitMonth} (${gtProfitValue})
 Greatest Decrease in Profits: {gtLossMonth} (${gtLossValue})
 ---------------------------
